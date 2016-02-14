@@ -29,12 +29,20 @@ int main( int argc , char * argv [] )
     auto vertices {v1,v2,v3,v4,v5,v6,v7,v8,v9};
     auto arcs {a1,a2,a3,a4,a5,a6,a7,a8,a9};
     
-    directed_graph d(vertices,arcs);
-
-    d.display();
-     
-    d.topological_sorting();
-    return EXIT_SUCCESS;
+    try
+    {
+	    directed_graph d(vertices,arcs);
+	
+	
+	    d.display();
+	     
+	    d.topological_sorting();
+	    return EXIT_SUCCESS;
+    }
+    catch (const graph_exception & e)
+    {
+    	std::cout << e.what() << std::endl;
+    }
 }
 
 
