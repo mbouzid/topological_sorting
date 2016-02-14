@@ -1,4 +1,4 @@
-#include "vertex.h"
+#include "vertex.hpp"
 
 std::ostream & operator <<( std::ostream & os , const vertex & _ )
 {
