@@ -2,7 +2,8 @@
 
 #include <set>
 #include <iostream>
-#include "vertex.h"
+#include "vertex.hpp"
+#include "graph_exception.hpp"
 #include <initializer_list>
 #include <algorithm>
 #include <unistd.h>
