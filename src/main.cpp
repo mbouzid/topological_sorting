@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <iostream>
-#include "directed_graph.h"
+#include "directed_graph.hpp"
 #include <initializer_list> 
 
 
