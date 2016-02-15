@@ -7,81 +7,107 @@
 #include <initializer_list>
 #include <algorithm>
 #include <unistd.h>
+#include <list>
 
 class directed_graph
 {
 
     private :
         
-        std::set <vertex> m_vertices ;
+        /**
+        *   A directed graph is an ordered pair G = <V,A> where V is a set of vertices and A a set of arcs. 
+        *   @member {std::set<vertex>} m_vertices - the vertices are represented as a set of ordered vertices
+        *   @member {std::set<std::pair<vertex,vertex>} - the arcs are represented as a set of pair of vertices
+        **/        
+
+        std::set <vertex> m_vertices ;  
         std::set <std::pair<vertex,vertex>> m_arcs ;
 
     public :
-
-
+        
         unsigned int number_of_predecessors ( const vertex & _ ) const throw (graph_exception &)
         /**
-         *  Return the number of prededecessors of a vertex.
-         *  @method @access public @readonly 
-         *  @param {const vertex &} _ - a vertex
-         *  @return {unsigned int}
-         *  @throw {graph_exception &} - an exception is thrown if the vertex is not in the graph
-         **/
+        *   Return the in-degree of a vertex.
+        *   @param {const vertex & } _ - a vertex
+        *   @return {unsigned int}
+        *   @throws {graph_exception &} - an exception is thrown if the vertex is not in the graph 
+        **/
         {
-            return (predecessors_of(_).size());
+            if (belongs(_)) 
+                return (predecessors_of(_).size());
+            else 
+                throw (new graph_exception("No such vertex in the graph"));
         }
 
         unsigned int number_of_successors ( const vertex & _ ) const throw (graph_exception &)
-         /**
-         *  Return the number of successors of a vertex.
-         *  @method @access public @readonly 
-         *  @param {const vertex &} _ - a vertex
-         *  @return {unsigned int}
-         *  @throw {graph_exception &} - an exception is thrown if the vertex is not in the graph
-         **/
+        /**
+        *   Return the out-degree of a vertex.
+        *   @param {const vertex & } _ - a vertex
+        *   @return {unsigned int}
+        *   @throws {graph_exception &} - an exception is thrown if the vertex is not in the graph.
+        **/
         {
-            return (successors_of(_).size());
+            if (belongs(_))
+                return (successors_of(_).size());
+            else
+                throw (new graph_exception("No such vertex in the graph"));
         }
 
-        std::set<vertex>::iterator source() const
+        std::set<vertex>::iterator source() const throw (graph_exception &)
         /**
         *   Return the first source vertex
         *   @method @access public @readonly
         *   @return {std::set<vertex>::iterator}
+        *   @throws {graph_exception &} - an exception is thrown if the graph is acyclic 
+        *    i.e. none of the vertices is a source vertex
         **/
-        {
-            std::set<vertex>::iterator pred = m_vertices.begin();
-                
+        {    
+            std::set<vertex>::iterator  src;
             for ( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
             {             
-                if (number_of_predecessors(*i) == 0)
+                if (number_of_predecessors(*i) == 0)    // identify a vertex with an in-degree equals to zero (no incoming edge) 
                 {
-                    pred=i;
+                    src=i;     
                 }
-    
             } 
 
-            return pred;
+            if (src!=m_vertices.end())
+                return src;
+            else
+                throw (new graph_exception("Acyclic graph"));
+               
+        
         }
 
-        void topological_sorting() 
+        static void topological_sorting (const directed_graph & _ ) throw (graph_exception&)
         /**
         *   Topological sorting algorithm.
-        *   @method @access public 
+        *   @method @access public @static
+        *   @throws {graph_exception&} - an exception is thrown if the graph is not an directed acyclic graph (aka DAG) 
         **/ 
         {
-                
-            while ( !is_empty() )
+            std::list<vertex> output; //this is where the vertices will be placed
+            directed_graph c(_);
+
+            while ( !c.is_empty() )   // repeat until the graph is empty 
             {
-                std::cout << *source() << " ";
-                get_rid_of(*(source()));
-                
+                output.push_back(*(c.source())); // insertion of the first identified source vertex in the output
+                c.get_rid_of(*(c.source()));    // deletion of this vertex and all his outgoing edges 
+            }
+            
+            // display the output 
+            std::cout << "Ordering of vertices : " ;
+            for( auto i = output.begin() ; i!= output.end() ; ++i )
+            {
+                std::cout << *i << " " ;
             }
 
             std::cout << std::endl;
             
             
-        }   
+        }
+
+     
         
         directed_graph( const std::set<vertex> & vertices , const std::set<std::pair<vertex,vertex>> & arcs )
         /** 
@@ -90,10 +116,6 @@ class directed_graph
         *   @param {const std::set<vertex> &} vertices
         *   @param {const std::set<std::pair<vertex,vertex>> &} arcs 
         **/
-        
-        /** TODO 
-         * Check if the graph is acyclic 
-         **/
         {
             for( auto i = vertices.begin() ; i!= vertices.end() ; ++i)
             {
@@ -140,7 +162,19 @@ class directed_graph
         {
 
         }
-
+        
+        directed_graph( const directed_graph & _ )
+        {
+            for ( auto i = _.m_vertices.begin() ; i!= _.m_vertices.end() ; ++i )
+            {   
+                m_vertices.insert(*i);
+            }
+            
+            for ( auto i = _.m_arcs.begin() ; i!= _.m_arcs.end() ; ++i )
+            {
+                m_arcs.insert(*i);
+            }
+        }
 
         ~directed_graph()
         /**
@@ -178,28 +212,28 @@ class directed_graph
         *   Get rid of a vertex and the arcs associated with it.
         *   @method @access public
         *   @param {const vertex &} _ - a vertex
-        *   @throw {graph_exception&} - an exception is thrown if the vertex isn't in the graph
         **/
         {
-            if (! belongs(_) ) throw new graph_exception("No such vertex in the graph");
+        	if (! belongs(_) ) throw new graph_exception("No such vertex in the graph");
         	else
         	{
-                for( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
-                {
-                    if ((*i)==_) 
-                    {
-                        m_vertices.erase(*i);
-                    }
-                }
-                
-                for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
-                {
-                    if (((*i).first==_)||((*i).second==_))
-                    {
-                        m_arcs.erase(*i);
-                    }
-                }
-        	}
+        	
+		        for( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
+		        {
+		            if ((*i)==_) 
+		            {
+		                m_vertices.erase(*i);
+		            }
+		        }
+		        
+		        for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
+		        {
+		            if (((*i).first==_)||((*i).second==_))
+		            {
+		                m_arcs.erase(*i);
+		            }
+		        }
+		    }
         }
 
          
@@ -233,53 +267,44 @@ class directed_graph
             return m_vertices;
         }
 
-        std::set<vertex> successors_of( const vertex & _ ) const throw (graph_exception&)
+        std::set<vertex> successors_of( const vertex & _ ) const
         /**
         *   Return the list of the successors of a vertex.
         *   @method @access public @readonly
         *   @param {const vertex&} _ - a vertex
         *   @return {std::set<vertex>}
-        *   @throw {graph_exception&} - an exception is thrown if the vertex isn't in the graph
         **/
         {
+            std::set<vertex> successors;
             if (belongs(_))
             {
-                std::set<vertex> successors;
                 for( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
                 {
                     if ( (*i).first == _ )
                         successors.insert((*i).second);
-                } 
-                
-                return successors; 
+                }
             }
-            else 
-                throw new graph_exception ("No such vertex in the graph");
-           
+            return successors; 
         }
 
-        std::set<vertex> predecessors_of( const  vertex & _ ) const throw (graph_exception &)
+        std::set<vertex> predecessors_of( const  vertex & _ ) const
         /**
         *   Return the list of the predecessors of a vertex.
         *   @method @access public @readonly
         *   @param {const vertex &} _ - a vertex 
         *   @return std::set<vertex>
-        *   @throw {graph_exception &} - an exception is thrown if the vertex isn't in the grapgh
         **/
         {
+            std::set<vertex> predecessors;
             if (belongs(_))
             {
-                std::set<vertex> predecessors;
                 for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
                 {
                     if ( (*i).second == _ )
                         predecessors.insert((*i).first);
                 }
-                return predecessors;
             }
-            else
-                throw new graph_exception("No such vertex in the graph");
-            
+            return predecessors;
         }
 };
 
