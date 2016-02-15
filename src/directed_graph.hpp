@@ -62,7 +62,7 @@ class directed_graph
         *    i.e. none of the vertices is a source vertex
         **/
         {    
-            std::set<vertex>::iterator  src;
+            std::set<vertex>::iterator src;
             for ( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
             {             
                 if (number_of_predecessors(*i) == 0)    // identify a vertex with an in-degree equals to zero (no incoming edge) 
@@ -83,6 +83,7 @@ class directed_graph
         /**
         *   Topological sorting algorithm.
         *   @method @access public @static
+        *   @param {const directed_graph &} _ - a graph 
         *   @throws {graph_exception&} - an exception is thrown if the graph is not an directed acyclic graph (aka DAG) 
         **/ 
         {
@@ -103,7 +104,6 @@ class directed_graph
             }
 
             std::cout << std::endl;
-            
             
         }
 
@@ -164,6 +164,11 @@ class directed_graph
         }
         
         directed_graph( const directed_graph & _ )
+        /**
+         *  Copy constructor.
+         *  @constructor @access public
+         *  @param {const directed_graph & } _ - a graph to copy
+         **/
         {
             for ( auto i = _.m_vertices.begin() ; i!= _.m_vertices.end() ; ++i )
             {   
