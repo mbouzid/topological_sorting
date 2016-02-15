@@ -1,0 +1,16 @@
+INSTALL - Installation of `topological_sorting` .
+
+This file contains instructions for compiling `topological_sorting`.
+
+Contents
+1. Unix
+
+
+1. Unix
+=======
+
+Summary:
+1. make			run configure, compile and link
+
+See the start of Makefile for more detailed instructions about how to compile
+`topological_sorting`.
