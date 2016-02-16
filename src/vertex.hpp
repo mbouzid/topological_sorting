@@ -1,18 +1,19 @@
 #pragma once 
 
 #include <iostream>
-#include <sstream>
+#include <string>
+
 class vertex
 {
     
     private :
         
-        char m_symbol;
+        std::string m_symbol;
         unsigned int m_label ;
         
     public :
         
-        vertex( char symbol , unsigned int label ):m_symbol(symbol),m_label(label)
+        vertex( const std::string & symbol , unsigned int label ):m_symbol(symbol),m_label(label)
         /**
         *   Constructor.
         *   @constructor @access public
@@ -56,11 +57,11 @@ class vertex
             return (m_label==_.m_label);
         }
 
-        char get_symbol() const
+        std::string get_symbol() const
         /**
         *   Symbol getter.
         *   @method @access public @readonly
-        *   @return {char}
+        *   @return {std::string}
         **/
         {
             return m_symbol;
