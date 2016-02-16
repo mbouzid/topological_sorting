@@ -8,7 +8,9 @@
 #include <algorithm>
 #include <unistd.h>
 #include <list>
+#include "arc.hpp"
 
+template <class W>
 class directed_graph
 {
 
@@ -21,10 +23,41 @@ class directed_graph
         **/        
 
         std::set <vertex> m_vertices ;  
-        std::set <std::pair<vertex,vertex>> m_arcs ;
+        std::set < arc<W> > m_arcs ;
 
+        
     public :
         
+        W longest_path() const
+        /**
+        *   Return the longest path according to the weights of the arcs.
+        *   @method @access public @readonly
+        *   @return {W}
+        **/
+        {    
+                   /** TODO **/
+            return 0;
+        }
+    
+        directed_graph ( const std::initializer_list<vertex> & vertices , const std::initializer_list<arc<W>> & arcs )
+        /**
+        *   Constructor.
+        *   @constructor @access public
+        *   @param {const std::initializer_list<vertex> &} vertices 
+        *   @param {const std::initializer_list< arc<W> > &} arcs
+        **/
+        {
+            for( auto i = vertices.begin() ; i!= vertices.end() ; ++i )
+            {
+                m_vertices.insert(*i);
+            }
+            
+            for( auto i = arcs.begin() ; i!= arcs.end() ; ++i )
+            {
+                m_arcs.insert(*i);
+            }
+        }
+                
         unsigned int number_of_predecessors ( const vertex & _ ) const throw (graph_exception &)
         /**
         *   Return the in-degree of a vertex.
@@ -55,14 +88,14 @@ class directed_graph
 
         std::set<vertex>::iterator source() const throw (graph_exception &)
         /**
-        *   Return the first source vertex
+        *   Return the last source vertex
         *   @method @access public @readonly
         *   @return {std::set<vertex>::iterator}
         *   @throws {graph_exception &} - an exception is thrown if the graph is acyclic 
         *    i.e. none of the vertices is a source vertex
         **/
         {    
-            std::set<vertex>::iterator src;
+            std::set<vertex>::iterator src ;
             for ( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
             {             
                 if (number_of_predecessors(*i) == 0)    // identify a vertex with an in-degree equals to zero (no incoming edge) 
@@ -83,7 +116,6 @@ class directed_graph
         /**
         *   Topological sorting algorithm.
         *   @method @access public @static
-        *   @param {const directed_graph &} _ - a graph 
         *   @throws {graph_exception&} - an exception is thrown if the graph is not an directed acyclic graph (aka DAG) 
         **/ 
         {
@@ -109,49 +141,7 @@ class directed_graph
 
      
         
-        directed_graph( const std::set<vertex> & vertices , const std::set<std::pair<vertex,vertex>> & arcs )
-        /** 
-        *   Constructor.
-        *   Creates a directed graph according to a set of vertices and a set of pairs of vertices.
-        *   @param {const std::set<vertex> &} vertices
-        *   @param {const std::set<std::pair<vertex,vertex>> &} arcs 
-        **/
-        {
-            for( auto i = vertices.begin() ; i!= vertices.end() ; ++i)
-            {
-                m_vertices.insert(*i);
-            }
-    
-            for( auto i = arcs.begin() ; i != arcs.end() ; ++i )
-            {
-                if ( belongs((*i).first) && belongs((*i).second) )
-                    m_arcs.insert(*i);      
-            }
 
-        }
-
-        directed_graph( const std::initializer_list<vertex> & vertices , const std::initializer_list<std::pair<vertex,vertex>> & arcs )
-        /**
-        *   Constructor.
-        *   Creates a directed graph with two initializer_list
-        *   @constructor @access public
-        *   @param {std::initializer_list<vertex>} vertices
-        *   @param {std::initializer_list<std::pair<vertex,vertex>>} arcs
-        **/ 
-        {
-            for (auto i = vertices.begin() ; i!= vertices.end() ; ++i )
-            {
-                m_vertices.insert(*i);
-            }
-            for (auto i = arcs.begin() ; i!= arcs.end() ; ++i )
-            {
-                if (belongs((*i).first) && belongs((*i).second))
-                {
-                    m_arcs.insert(*i);
-                }
-            }
-
-        }
 
         directed_graph()
         /**
@@ -164,11 +154,6 @@ class directed_graph
         }
         
         directed_graph( const directed_graph & _ )
-        /**
-         *  Copy constructor.
-         *  @constructor @access public
-         *  @param {const directed_graph & } _ - a graph to copy
-         **/
         {
             for ( auto i = _.m_vertices.begin() ; i!= _.m_vertices.end() ; ++i )
             {   
@@ -221,23 +206,35 @@ class directed_graph
         {
         	if (! belongs(_) ) throw new graph_exception("No such vertex in the graph");
         	else
-        	{
-        	
-		        for( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
-		        {
-		            if ((*i)==_) 
-		            {
-		                m_vertices.erase(*i);
-		            }
-		        }
-		        
-		        for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
-		        {
-		            if (((*i).first==_)||((*i).second==_))
-		            {
-		                m_arcs.erase(*i);
-		            }
-		        }
+            {
+		            
+                std::set<vertex>::iterator i = m_vertices.begin();
+                while ( i != m_vertices.end() )
+                {
+                    if ( *i == _ )
+                    {
+                        m_vertices.erase(i++);
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                }
+                
+                typename std::set<arc<W>>::iterator j = m_arcs.begin();
+                while ( j != m_arcs.end() )
+                {
+                    if ( ( (*j).get_in() == _ ) || ( (*j).get_out() == _ ) )
+                    {
+                        m_arcs.erase(j++);
+                    }
+                    else
+                    {
+                        ++j;
+                    }
+                } 
+		      
+                
 		    }
         }
 
@@ -257,7 +254,7 @@ class directed_graph
 
             for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
             {
-                std::cout << "(" << (*i).first << "," << (*i).second << ")" << " ";
+                std::cout << *i << " ";
             }
             std::cout<< std::endl;
         } 
@@ -270,6 +267,16 @@ class directed_graph
         **/
         {
             return m_vertices;
+        }
+
+        const std::set<arc<W>> &  get_arcs() const
+        /**
+        *   Arcs getter.
+        *   @method @access public @readonly 
+        *   @return {const std::set<arc<W>> &}
+        **/
+        {
+            return m_arcs;
         }
 
         std::set<vertex> successors_of( const vertex & _ ) const
@@ -285,8 +292,8 @@ class directed_graph
             {
                 for( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
                 {
-                    if ( (*i).first == _ )
-                        successors.insert((*i).second);
+                    if ( (*i).get_in() == _ )
+                        successors.insert((*i).get_in());
                 }
             }
             return successors; 
@@ -305,8 +312,8 @@ class directed_graph
             {
                 for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
                 {
-                    if ( (*i).second == _ )
-                        predecessors.insert((*i).first);
+                    if ( (*i).get_out() == _ )
+                        predecessors.insert((*i).get_out());
                 }
             }
             return predecessors;
