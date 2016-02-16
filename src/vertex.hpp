@@ -18,7 +18,7 @@ class vertex
         /**
         *   Constructor.
         *   @constructor @access public
-        *   @param {int} label - the label of the vertex
+        *   @param {const std::string & } symbol - a symbol for the vertex
         **/{}
     
         vertex( const vertex & _ ):m_symbol(_.m_symbol),m_label(_.m_label)
