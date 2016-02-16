@@ -1,28 +1,28 @@
 #pragma once
 
-//std lib
 #include <set>
 #include <iostream>
+#include "vertex.hpp"
+#include "graph_exception.hpp"
 #include <initializer_list>
 #include <algorithm>
 #include <unistd.h>
 #include <list>
-
-//own lib
-#include "vertex.hpp"
-#include "graph_exception.hpp"
 #include "arc.hpp"
+
+unsigned int min_index( std::set<vertex> queue , int dist[] , unsigned int n );
 
 template <class W>
 class directed_graph
 {
 
     private :
-        
+
+                    
         /**
         *   A directed graph is an ordered pair G = <V,A> where V is a set of vertices and A a set of arcs. 
         *   @member {std::set<vertex>} m_vertices - the vertices are represented as a set of ordered vertices
-        *   @member {std::set<arc<W>>} - the arcs are represented as a set of ordered arcs
+        *   @member {std::set<std::pair<vertex,vertex>} - the arcs are represented as a set of pair of vertices
         **/        
 
         std::set <vertex> m_vertices ;  
@@ -30,20 +30,97 @@ class directed_graph
 
         
     public :
-        
-        //BONUS 
-        W shortest_path() const
+
+        unsigned int order() const
+        /**
+        *   Return the order of the graph, i.e. the number of its vertices
+        *   @method @access public @readonly
+        *   @return  {unsigned int}
+        **/
+        {
+            return (m_vertices.size());
+        }
+                    
+        void shortest_path() const
         /**
         *   Return the shortest path according to the weights of the arcs.
+        *	WARNING : graph MUST BE CONNECTED
         *   @method @access public @readonly
         *   @return {W}
         **/
-        {    
-                   /** TODO
-                   		Dijkstra algorithm !
-                   	**/
-            return 0;
+        {  
+        	
+        	unsigned int n = order() ;
+        	W dist[n] ;
+        	std::set<vertex> queue;
+        	
+        	// set all the distances to 'infinity'
+        	for ( unsigned int i = 0 ; i<n ; ++i )
+        	{
+        		dist[i]=100000;
+        		
+        	}
+        	
+        
+        	//distance to all source vertex is zero 
+        	for ( auto i= m_vertices.begin() ; i!= m_vertices.end() ; ++i )
+        	{
+        		queue.insert(*i);
+        		if ( number_of_predecessors(*i) == 0 )
+        		{
+        				dist[(*i).get_label()] = 0 ;
+        		}
+        	}
+
+	
+        	while ( ! queue.empty() )
+        	{
+        	
+        		unsigned int u = min_index(queue,dist,n) ; // select  the  element  of  Q  with  the  min. distance
+        		
+        		for ( auto j = queue.begin() ; j!= queue.end() ; ++j )
+        		{
+        			if ( (*j).get_label() == u )
+        			{
+        				queue.erase(j);	// erase the vertex visited
+        			}
+        		}
+     
+        		
+        		for( auto a = m_arcs.begin() ; a!=m_arcs.end() ; ++a )
+        		{
+        				
+        			// for all neighbours of u 
+        			if ( (*a).get_in().get_label() == u  )
+        			{
+        				unsigned int v = (*a).get_out().get_label();
+        	
+        				if ( dist[v]  > dist[u] + (*a).get_weight() ) // if  new  shortest  path found
+        				{
+        					dist[v]=dist[u]+(*a).get_weight(); //set  new  value  of  shortest path
+        				
+        				}
+        			}
+        			
+        		
+        		}
+        		
+        	}
+        	
+        	std::cout << "Dijkstra algorithm result : " << std::endl ;
+        	
+        	//Original algorithm outputs value of shortest path  not the path itself 
+        	for ( unsigned int i = 0 ; i<n ; ++i )
+        	{
+        		std::cout << " -> shortest distance(0," << i << ")=" << dist[i] << " " << std::endl ;
+       
+        	}
+      
+
         }
+
+
+   
     
         directed_graph ( const std::initializer_list<vertex> & vertices , const std::initializer_list<arc<W>> & arcs )
         /**
@@ -121,7 +198,7 @@ class directed_graph
         static void topological_sorting (const directed_graph & _ ) throw (graph_exception&)
         /**
         *   Topological sorting algorithm.
-        *   @access public @static
+        *   @method @access public @static
         *   @throws {graph_exception&} - an exception is thrown if the graph is not an directed acyclic graph (aka DAG) 
         **/ 
         {
@@ -135,7 +212,7 @@ class directed_graph
             }
             
             // display the output 
-            std::cout << "Ordering of vertices : " ;
+            std::cout << "topological ordering of vertices : " ;
             for( auto i = output.begin() ; i!= output.end() ; ++i )
             {
                 std::cout << *i << " " ;
@@ -160,11 +237,6 @@ class directed_graph
         }
         
         directed_graph( const directed_graph & _ )
-        /**
-         * Copy constructor
-         * @constructor @access public
-         * @param {const directed_graph &} _ - a graph to copy
-         **/
         {
             for ( auto i = _.m_vertices.begin() ; i!= _.m_vertices.end() ; ++i )
             {   
@@ -215,36 +287,35 @@ class directed_graph
         *   @param {const vertex &} _ - a vertex
         **/
         {
-        	if (! belongs(_) ) 
-        		throw new graph_exception("No such vertex in the graph");
+        	if (! belongs(_) ) throw new graph_exception("No such vertex in the graph");
         	else
-            	{
+            {
 		            
-                	std::set<vertex>::iterator i = m_vertices.begin();
-	                while ( i != m_vertices.end() )
-	                {
-	                    if ( *i == _ )
-	                    {
-	                        m_vertices.erase(i++);
-	                    }
-	                    else
-	                    {
-	                        ++i;
-	                    }
-	                }
-	                
-	                typename std::set<arc<W>>::iterator j = m_arcs.begin();
-	                while ( j != m_arcs.end() )
-	                {
-	                    if ( ( (*j).get_in() == _ ) || ( (*j).get_out() == _ ) )
-	                    {
-	                        m_arcs.erase(j++);
-	                    }
-	                    else
-	                    {
-	                        ++j;
-	                    }
-	                } 
+                std::set<vertex>::iterator i = m_vertices.begin();
+                while ( i != m_vertices.end() )
+                {
+                    if ( *i == _ )
+                    {
+                        m_vertices.erase(i++);
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                }
+                
+                typename std::set<arc<W>>::iterator j = m_arcs.begin();
+                while ( j != m_arcs.end() )
+                {
+                    if ( ( (*j).get_in() == _ ) || ( (*j).get_out() == _ ) )
+                    {
+                        m_arcs.erase(j++);
+                    }
+                    else
+                    {
+                        ++j;
+                    }
+                } 
 		      
                 
 		    }
@@ -257,13 +328,14 @@ class directed_graph
         *   @method @access public @readonly
         **/
         {
+        	std::cout << "vertices : "  ;
             for( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
             {
                std::cout << (*i) << " " ;
             }
             
             std::cout << std::endl;
-
+			std::cout << "arcs : " ;
             for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
             {
                 std::cout << *i << " ";
@@ -293,7 +365,7 @@ class directed_graph
 
         std::set<vertex> successors_of( const vertex & _ ) const
         /**
-        *   Return a list of the successors of a vertex.
+        *   Return the list of the successors of a vertex.
         *   @method @access public @readonly
         *   @param {const vertex&} _ - a vertex
         *   @return {std::set<vertex>}
@@ -313,7 +385,7 @@ class directed_graph
 
         std::set<vertex> predecessors_of( const  vertex & _ ) const
         /**
-        *   Return a list of the predecessors of a vertex.
+        *   Return the list of the predecessors of a vertex.
         *   @method @access public @readonly
         *   @param {const vertex &} _ - a vertex 
         *   @return std::set<vertex>
