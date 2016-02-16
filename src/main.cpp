@@ -1,17 +1,13 @@
 #include <stdlib.h>
-//std lib
 #include <iostream>
-#include <initializer_list> 
-
-
-//own lib
-#include "arc.hpp"
 #include "directed_graph.hpp"
+#include <initializer_list> 
+#include "arc.hpp"
 
 int main( int argc , char * argv [] )
 {
     
-    //@see `Wiki` tab in GitHub for the source of this example
+    /*		EXAMPLE 1 BROWNIES
     
     vertex v1("début",0);
     vertex v2("A",1);
@@ -45,15 +41,39 @@ int main( int argc , char * argv [] )
         
 
     directed_graph<int> d({v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11,v12},{a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16});
-
+	
+	
+	*/
+	
+	
+	/* EXAMPLE 2 */
+		vertex v1("1");
+    vertex v2("2");
+    vertex v3("3");
+    vertex v4("4");
+    vertex v5("5");
+    vertex v6("6");
+    
+    arc<int> a1 (v1,v2,2);    
+    arc<int> a2 (v1,v4,4);
+    arc<int> a3 (v2,v3,1);
+    arc<int> a4 (v3,v5,3);
+    arc<int> a5 (v5,v4,3);
+    arc<int> a6 (v5,v6,2);
+    arc<int> a7(v4,v6,2);
+    arc<int> a8(v2,v4,4);
+ 	  arc<int> a9(v2,v5,2);
+	
+	directed_graph<int> d({v1,v2,v3,v4,v5,v6},{a1,a2,a3,a4,a5,a6,a7,a8,a9});
+	
     try
     {
         d.display();
      
         directed_graph<int>::topological_sorting(d);
-       
-        d.display();
- 
+  
+ 		d.shortest_path();
+ 		
         return EXIT_SUCCESS;
     }
     catch (const graph_exception & e )
