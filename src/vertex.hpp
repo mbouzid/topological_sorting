@@ -10,10 +10,11 @@ class vertex
         
         std::string m_symbol;
         unsigned int m_label ;
+        static unsigned int s_label ;
         
     public :
         
-        vertex( const std::string & symbol , unsigned int label ):m_symbol(symbol),m_label(label)
+        vertex( const std::string & symbol ):m_symbol(symbol),m_label(s_label++)
         /**
         *   Constructor.
         *   @constructor @access public
@@ -66,7 +67,16 @@ class vertex
         {
             return m_symbol;
         }            
-        
+
+        unsigned int get_label() const
+        /**
+        *   Label getter.
+        *   @method @access public @readonly 
+        *   @return {unsigned int}
+        **/
+        {
+            return m_label ;    
+        }         
 };
 
 std::ostream & operator << ( std::ostream & os , const vertex & _ );
