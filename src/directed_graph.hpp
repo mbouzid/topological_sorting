@@ -1,13 +1,16 @@
 #pragma once
 
+//std lib
 #include <set>
 #include <iostream>
-#include "vertex.hpp"
-#include "graph_exception.hpp"
 #include <initializer_list>
 #include <algorithm>
 #include <unistd.h>
 #include <list>
+
+//own lib
+#include "vertex.hpp"
+#include "graph_exception.hpp"
 #include "arc.hpp"
 
 template <class W>
@@ -19,7 +22,7 @@ class directed_graph
         /**
         *   A directed graph is an ordered pair G = <V,A> where V is a set of vertices and A a set of arcs. 
         *   @member {std::set<vertex>} m_vertices - the vertices are represented as a set of ordered vertices
-        *   @member {std::set<std::pair<vertex,vertex>} - the arcs are represented as a set of pair of vertices
+        *   @member {std::set<arc<W>>} - the arcs are represented as a set of ordered arcs
         **/        
 
         std::set <vertex> m_vertices ;  
@@ -28,14 +31,17 @@ class directed_graph
         
     public :
         
-        W longest_path() const
+        //BONUS 
+        W shortest_path() const
         /**
-        *   Return the longest path according to the weights of the arcs.
+        *   Return the shortest path according to the weights of the arcs.
         *   @method @access public @readonly
         *   @return {W}
         **/
         {    
-                   /** TODO **/
+                   /** TODO
+                   		Dijkstra algorithm !
+                   	**/
             return 0;
         }
     
@@ -115,7 +121,7 @@ class directed_graph
         static void topological_sorting (const directed_graph & _ ) throw (graph_exception&)
         /**
         *   Topological sorting algorithm.
-        *   @method @access public @static
+        *   @access public @static
         *   @throws {graph_exception&} - an exception is thrown if the graph is not an directed acyclic graph (aka DAG) 
         **/ 
         {
@@ -154,6 +160,11 @@ class directed_graph
         }
         
         directed_graph( const directed_graph & _ )
+        /**
+         * Copy constructor
+         * @constructor @access public
+         * @param {const directed_graph &} _ - a graph to copy
+         **/
         {
             for ( auto i = _.m_vertices.begin() ; i!= _.m_vertices.end() ; ++i )
             {   
@@ -204,35 +215,36 @@ class directed_graph
         *   @param {const vertex &} _ - a vertex
         **/
         {
-        	if (! belongs(_) ) throw new graph_exception("No such vertex in the graph");
+        	if (! belongs(_) ) 
+        		throw new graph_exception("No such vertex in the graph");
         	else
-            {
+            	{
 		            
-                std::set<vertex>::iterator i = m_vertices.begin();
-                while ( i != m_vertices.end() )
-                {
-                    if ( *i == _ )
-                    {
-                        m_vertices.erase(i++);
-                    }
-                    else
-                    {
-                        ++i;
-                    }
-                }
-                
-                typename std::set<arc<W>>::iterator j = m_arcs.begin();
-                while ( j != m_arcs.end() )
-                {
-                    if ( ( (*j).get_in() == _ ) || ( (*j).get_out() == _ ) )
-                    {
-                        m_arcs.erase(j++);
-                    }
-                    else
-                    {
-                        ++j;
-                    }
-                } 
+                	std::set<vertex>::iterator i = m_vertices.begin();
+	                while ( i != m_vertices.end() )
+	                {
+	                    if ( *i == _ )
+	                    {
+	                        m_vertices.erase(i++);
+	                    }
+	                    else
+	                    {
+	                        ++i;
+	                    }
+	                }
+	                
+	                typename std::set<arc<W>>::iterator j = m_arcs.begin();
+	                while ( j != m_arcs.end() )
+	                {
+	                    if ( ( (*j).get_in() == _ ) || ( (*j).get_out() == _ ) )
+	                    {
+	                        m_arcs.erase(j++);
+	                    }
+	                    else
+	                    {
+	                        ++j;
+	                    }
+	                } 
 		      
                 
 		    }
@@ -281,7 +293,7 @@ class directed_graph
 
         std::set<vertex> successors_of( const vertex & _ ) const
         /**
-        *   Return the list of the successors of a vertex.
+        *   Return a list of the successors of a vertex.
         *   @method @access public @readonly
         *   @param {const vertex&} _ - a vertex
         *   @return {std::set<vertex>}
@@ -301,7 +313,7 @@ class directed_graph
 
         std::set<vertex> predecessors_of( const  vertex & _ ) const
         /**
-        *   Return the list of the predecessors of a vertex.
+        *   Return a list of the predecessors of a vertex.
         *   @method @access public @readonly
         *   @param {const vertex &} _ - a vertex 
         *   @return std::set<vertex>
