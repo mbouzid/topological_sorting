@@ -76,7 +76,7 @@ class directed_graph
         	while ( ! queue.empty() )
         	{
         	
-        		unsigned int u = min_index(queue,dist,n) ; // select  the  element  of  Q  with  the  min. distance
+        		unsigned int u = min_index(queue,dist,n) ; // select  the  element  of  queue  with  the  mininum distance
         		
         		for ( auto j = queue.begin() ; j!= queue.end() ; ++j )
         		{
@@ -90,7 +90,7 @@ class directed_graph
         		for( auto a = m_arcs.begin() ; a!=m_arcs.end() ; ++a )
         		{
         				
-        			// for all neighbours of u 
+        			// for all predecessors of u 
         			if ( (*a).get_in().get_label() == u  )
         			{
         				unsigned int v = (*a).get_out().get_label();
@@ -112,7 +112,7 @@ class directed_graph
         	//Original algorithm outputs value of shortest path  not the path itself 
         	for ( unsigned int i = 0 ; i<n ; ++i )
         	{
-        		std::cout << " -> shortest distance(0," << i << ")=" << dist[i] << " " << std::endl ;
+        		std::cout << " -> shortest distance(1," << i+1 << ")=" << dist[i] << " " << std::endl ;
        
         	}
       
