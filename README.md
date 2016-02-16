@@ -1,4 +1,4 @@
-# topological_sorting & Dijkstra algorithm (!!BONUS!!)
+# topological_sorting & Dijkstra algorithm [EXTRA]
 
 ## Build in C++ 
 
