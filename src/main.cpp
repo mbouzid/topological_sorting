@@ -1,12 +1,17 @@
 #include <stdlib.h>
+//std lib
 #include <iostream>
-#include "directed_graph.hpp"
 #include <initializer_list> 
+
+
+//own lib
 #include "arc.hpp"
+#include "directed_graph.hpp"
 
 int main( int argc , char * argv [] )
 {
     
+    //@see `Wiki` tab in GitHub for the source of this example
     
     vertex v1("début",0);
     vertex v2("A",1);
