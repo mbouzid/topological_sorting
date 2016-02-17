@@ -31,6 +31,27 @@ class directed_graph
         
     public :
 
+
+		vertex get_vertex ( unsigned int label ) const throw (graph_exception &)
+		/**
+		*	Return the vertex according to its label.
+		*	@method @access public @readonly
+		*	@param {unsigned int} label
+		*	@return {vertex}
+		*	@throws {graph_exception &} - an exception is thrown if the label does not correspond to any vertex
+		**/
+		{
+			for ( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
+			{
+				if ( (*i).get_label() == label )
+				{
+					return (*i);
+				}
+			}
+			
+			throw (new graph_exception("This label does not correponds to a vertex"));
+			
+		}
         unsigned int order() const
         /**
         *   Return the order of the graph, i.e. the number of its vertices
@@ -121,7 +142,11 @@ class directed_graph
 		    	//Original algorithm outputs value of shortest path  not the path itself 
 		    	for ( unsigned int i = 0 ; i<n ; ++i )
 		    	{
-		    		std::cout << " -> shortest distance "<< "(" << source.get_label() << "," << i << ")=" << dist[i] << " " << std::endl ;
+		    		if ( source.get_label() != i )
+		    		{
+		    			std::cout << " -> shortest distance "<< "(" << source << "," 
+		    			<< get_vertex(i) << ")=" << dist[i] << " " << std::endl ;
+		    		}
 		    	}
             }
             else
