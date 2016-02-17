@@ -8,7 +8,7 @@ class arc
     private :
 
         /**
-        *   An arc is established between two vertices. 
+        *   This class represents arc between two vertices.
         *   @member {std::pair<vertex,vertex>} m_pair - the vertices linked
         *   @member {W} m_weight - the weight between the vertices
         *   @member {unsigned int} m_label - an extra information in order to distinguish arcs.
@@ -21,7 +21,8 @@ class arc
         unsigned int m_label ;
 
     public :
-        
+
+                
         arc( const vertex & in , const vertex & out , const W & weight ):m_pair(std::make_pair(in,out)),m_weight(weight),m_label(++s_label)
         /**
         *   Constructor
@@ -87,6 +88,9 @@ class arc
             return m_label<_.m_label ;  
         }  
 };      
+
+template <typename W>
+bool operator <( const arc<W> & a , const arc<W> & b ) ;
 
 template <typename W>
 std::ostream & operator <<( std::ostream & os , const arc<W> & _ ) ;
