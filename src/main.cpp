@@ -1,8 +1,11 @@
+//std lib
 #include <stdlib.h>
 #include <iostream>
-#include "directed_graph.hpp"
 #include <initializer_list> 
+
+//own lib
 #include "arc.hpp"
+#include "directed_graph.hpp"
 
 int main( int argc , char * argv [] )
 {
