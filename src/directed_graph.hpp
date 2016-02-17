@@ -41,81 +41,91 @@ class directed_graph
             return (m_vertices.size());
         }
                     
-        void shortest_path() const
+        void shortest_path( const vertex & source ) const throw (graph_exception &)
         /**
-        *   Return the shortest path according to the weights of the arcs.
+        *   Return the shortest path from a vertex source according to the weights of the arcs.
         *	WARNING : graph MUST BE CONNECTED
         *   @method @access public @readonly
-        *   @return {W}
+        *   @param {const vertex & } source - a vertex source
+        *   @throws {graph_exception &} - an exception is thrown if the source vertex does not belong to the graph
         **/
         {  
-        	
-        	unsigned int n = order() ;
-        	W dist[n] ;
-        	std::set<vertex> queue;
-        	
-        	// set all the distances to 'infinity'
-        	for ( unsigned int i = 0 ; i<n ; ++i )
-        	{
-        		dist[i]=100000;
-        		
-        	}
-        	
-        
-        	//distance to all source vertex is zero 
-        	for ( auto i= m_vertices.begin() ; i!= m_vertices.end() ; ++i )
-        	{
-        		queue.insert(*i);
-        		if ( number_of_predecessors(*i) == 0 )
-        		{
-        				dist[(*i).get_label()] = 0 ;
-        		}
-        	}
+        	if ( belongs(source) )
+            {
+		    	unsigned int n = order() ;
+		    	W dist[n] ;						//dist[] is an array indexed to the label of the vertices
+		    	std::set<vertex> queue;			
+		    	
+		    	// set all the distances to 'infinity'
+		    	for ( unsigned int i = 0 ; i<n ; ++i )
+		    	{
+		    		dist[i]=100000;
+		    	}
+		        
+		    	dist[source.get_label()] =0; //distance to the source vertex is zero 
+
+		        // set the queue with all the vertices
+		    	for ( auto i= m_vertices.begin() ; i!= m_vertices.end() ; ++i )
+		    	{
+		    		queue.insert(*i);        		
+		    	}
 
 	
-        	while ( ! queue.empty() )
-        	{
-        	
-        		unsigned int u = min_index(queue,dist,n) ; // select  the  element  of  queue  with  the  mininum distance
-        		
-        		for ( auto j = queue.begin() ; j!= queue.end() ; ++j )
-        		{
-        			if ( (*j).get_label() == u )
-        			{
-        				queue.erase(j);	// erase the vertex visited
-        			}
-        		}
-     
-        		
-        		for( auto a = m_arcs.begin() ; a!=m_arcs.end() ; ++a )
-        		{
-        				
-        			// for all predecessors of u 
-        			if ( (*a).get_in().get_label() == u  )
-        			{
-        				unsigned int v = (*a).get_out().get_label();
-        	
-        				if ( dist[v]  > dist[u] + (*a).get_weight() ) // if  new  shortest  path found
-        				{
-        					dist[v]=dist[u]+(*a).get_weight(); //set  new  value  of  shortest path
-        				
-        				}
-        			}
-        			
-        		
-        		}
-        		
-        	}
-        	
-        	std::cout << "Dijkstra algorithm result : " << std::endl ;
-        	
-        	//Original algorithm outputs value of shortest path  not the path itself 
-        	for ( unsigned int i = 0 ; i<n ; ++i )
-        	{
-        		std::cout << " -> shortest distance(1," << i+1 << ")=" << dist[i] << " " << std::endl ;
-       
-        	}
-      
+		    	while ( ! queue.empty() )
+		    	{
+		    	
+		    		unsigned int u = min_index(queue,dist,n) ; // select  the  element  of  queue  with  the  minimal distance
+		    		
+		    		for ( auto j = queue.begin() ; j!= queue.end() ; j++ )
+		    		{
+		    			if ( (*j).get_label() == u )
+		    			{
+		    				queue.erase(*j);	// erase the vertex visited
+		    			}
+		    		}
+		 
+		    		
+		    		for( auto a = m_arcs.begin() ; a!=m_arcs.end() ; ++a )
+		    		{
+		    				
+		    			// for all successors of u 
+		    			if ( (*a).get_in().get_label() == u  ) 
+		    			{
+		    				unsigned int v = (*a).get_out().get_label(); // get the successor
+		    	
+		    				if ( dist[v]  > dist[u] + (*a).get_weight() ) // if  new  shortest  path found
+		    				{
+		    					dist[v]=dist[u]+(*a).get_weight(); //set  new  value  of  shortest path
+		    				
+		    				}
+		    			}
+		    			else
+		    			// for all predecessors of u 
+		    			if ( (*a).get_out().get_label() == u  ) 
+		    			{
+		    				unsigned int v = (*a).get_in().get_label(); // get the predecessor
+		    	
+		    				if ( dist[v]  > dist[u] + (*a).get_weight() ) // if  new  shortest  path found
+		    				{
+		    					dist[v]=dist[u]+(*a).get_weight(); //set  new  value  of  shortest path
+		    				
+		    				}
+		    			}
+
+		    		}
+		    		
+		    	}
+		    	
+		    	std::cout << "Dijkstra algorithm result : " << std::endl ;
+		    	
+		    	//Original algorithm outputs value of shortest path  not the path itself 
+		    	for ( unsigned int i = 0 ; i<n ; ++i )
+		    	{
+		    		std::cout << " -> shortest distance "<< "(" << source.get_label() << "," << i << ")=" << dist[i] << " " << std::endl ;
+		    	}
+            }
+            else
+                throw (new graph_exception("No such vertex in the graph"));
 
         }
 
@@ -335,10 +345,10 @@ class directed_graph
             }
             
             std::cout << std::endl;
-			std::cout << "arcs : " ;
+			std::cout << "arcs : " << std::endl ;
             for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
             {
-                std::cout << *i << " ";
+                std::cout << *i << std::endl ;
             }
             std::cout<< std::endl;
         } 
