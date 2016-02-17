@@ -1,14 +1,17 @@
 #pragma once
 
+//std lib
 #include <set>
 #include <iostream>
-#include "vertex.hpp"
-#include "graph_exception.hpp"
 #include <initializer_list>
 #include <algorithm>
 #include <unistd.h>
 #include <list>
+
+//own lib
 #include "arc.hpp"
+#include "vertex.hpp"
+#include "graph_exception.hpp"
 
 unsigned int min_index( std::set<vertex> queue , int dist[] , unsigned int n );
 
