@@ -1,6 +1,11 @@
 #pragma once
 
+//own lib
 #include "vertex.hpp"
+
+//std lib
+#include <ostream>
+#include <iostream>
 
 template <class W>
 class arc
@@ -22,6 +27,19 @@ class arc
 
     public :
 
+        arc( const std::string & in , const std::string & out , const std::string & weight):m_pair(std::make_pair(vertex(in),vertex(out))),
+            m_weight( (W) ( atoi( weight.c_str() ) ) ),m_label(++s_label)
+        /**
+        *   Constructor
+        *   @constructor @access public
+        *   @param {const std::string &} in - the in vertex as a string
+        *   @param {const std::string &} out - the out vertex as a string 
+        *   @param {const std::string &} weight - the weight between the vertices as a string
+        **/
+        {
+        	
+        	
+        }        
                 
         arc( const vertex & in , const vertex & out , const W & weight ):m_pair(std::make_pair(in,out)),m_weight(weight),m_label(++s_label)
         /**
