@@ -34,9 +34,9 @@ int main( int argc , char * argv [] )
 				arc<int> a7(v4,v6,2);
 				arc<int> a8(v2,v4,4);
 			 	arc<int> a9(v2,v5,2);
+			
 	
 				directed_graph<int> d({v1,v2,v3,v4,v5,v6},{a1,a2,a3,a4,a5,a6,a7,a8,a9});
-	
 	
 				try
 				{
@@ -110,13 +110,12 @@ int main( int argc , char * argv [] )
 			 		d.shortest_path(v7);
 			 		
 			 		
-			 		
 					return EXIT_SUCCESS;
 				}
 				
 				catch (const graph_exception & e )
 				{
-					std::cerr << e.what() << std::endl ;
+					std::cout << e.what() << std::endl ;
 				
 					exit(EXIT_FAILURE);
 				}
@@ -127,6 +126,15 @@ int main( int argc , char * argv [] )
 		
 		
 		
+			}
+			
+			case 3 :
+			{
+			
+				directed_graph<int> d ;
+				d.load("examples/villes.txt");
+				d.display();
+				break ;
 			}
 		}
 	}
