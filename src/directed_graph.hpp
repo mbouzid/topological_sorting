@@ -1,5 +1,6 @@
 #pragma once
 
+
 //std lib
 #include <set>
 #include <iostream>
@@ -7,11 +8,14 @@
 #include <algorithm>
 #include <unistd.h>
 #include <list>
+#include <fstream>
+#include <ostream>
 
 //own lib
 #include "arc.hpp"
 #include "vertex.hpp"
 #include "graph_exception.hpp"
+#include "strfun.hpp"
 
 unsigned int min_index( std::set<vertex> queue , int dist[] , unsigned int n );
 
@@ -55,6 +59,26 @@ class directed_graph
 			throw (new graph_exception("This label does not correponds to a vertex"));
 			
 		}
+
+        vertex get_vertex ( const std::string & symbol ) const throw ( graph_exception & )
+        /**
+        *   Return the vertex according to its symbol
+        *   @method @access public @readonly
+        *   @param {const std::string &} symbol
+        *   @return {vertex}
+        *   @throws {graph_exception &} - an exception is thrown if the symbol does not correspond to any vertex
+        **/
+        {
+            for ( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
+            {
+                if ( (*i).get_symbol() == symbol )
+                {
+                    return (*i);
+                }
+            }
+            throw (new graph_exception("This symbol does not corresponds to a vertex"));
+        }
+
         unsigned int order() const
         /**
         *   Return the order of the graph, i.e. the number of its vertices
@@ -260,10 +284,6 @@ class directed_graph
             
         }
 
-     
-        
-
-
         directed_graph()
         /**
         *   Constructor.
@@ -273,6 +293,103 @@ class directed_graph
         {
 
         }
+
+        void add_vertex( const vertex & _ )
+        /**
+        *   Add a vertex in the graph.
+        *   @method @access public
+        *   @param {const vertex &} _ - a vertex
+        **/
+        {
+            m_vertices.insert(_);
+        }
+
+        void add_arc( const arc<W> & _ )
+        /**
+        *   Add an arc in the graph.
+        *   @method @access public
+        *   @param {const arc<W> &} _ - an arc
+        **/
+        {
+            m_arcs.insert(_);
+        }
+
+        void load( const char * filename )
+        /**
+        *   Load a graph from a file
+        *   @method @access public
+        *   @param {const char *} filename - a file name (or a path)
+        **/
+        {
+              std::ifstream f(filename,std::ios::in);
+              
+              if (f)
+              {
+              	std::string vertices , line ;	
+              	getline(f,vertices);	// the first line must specified the vertices
+              	
+              	std::string ** tokens_v = split(' ',vertices);	
+              	size_t i = 0 ;
+              	size_t words = number_words(' ',vertices);
+              	
+              	while ( i<words)
+              	{
+              		std::string symbol = *(tokens_v[i]) ;
+              		m_vertices.insert(vertex(symbol));
+              		++i;
+              		
+              	}
+             	
+             	free(tokens_v,words);
+             	
+             	std::string ** tokens_a ;
+           		// the others lines represent the arcs
+              	while ( getline(f,line,'\n') )
+              	{
+              		tokens_a = split(' ',line);
+              		m_arcs.insert(arc<W>(*tokens_a[0],*tokens_a[1],*tokens_a[2]) );	
+              		free(tokens_a,3);
+ 
+              	}
+              
+              	f.close();
+              }
+              else
+              		std::cerr << "Cannot open the file " << filename << std::endl;
+
+        }
+        
+        void save( const char * filename ) const
+        /**
+        *	Save a graph in a file.
+        *	@method @access public @readonly
+        *	@param {const char *} filename 
+        **/
+        {
+        	std::ofstream f(filename,std::ios::out);
+            
+            if (f)
+            {
+            	for ( auto i = m_vertices.begin() ; i!= m_vertices.end() ; ++i )
+            	{
+            		f << (*i) << " " ;
+            	}
+            	f << std::endl ;
+            	
+            	for ( auto i = m_arcs.begin() ; i!= m_arcs.end() ; ++i )
+            	{
+            		f << (*i).get_in() << " " << (*i).get_out() << " " << (*i).get_weight() << std::endl;
+            		
+            	}
+   
+            	f.close();
+            }
+            else
+            {
+            	std::cerr << "Cannot open the file" << filename << std::endl ;	
+            }
+        }
+        
         
         directed_graph( const directed_graph & _ )
         {
