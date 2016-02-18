@@ -1,0 +1,15 @@
+Paris Tours Bordeaux Toulouse Marseille Lyon Metz
+Paris Tours 240
+Tours Bordeaux 350
+Bordeaux Toulouse 240
+Toulouse Marseille 410
+Marseille Lyon 320
+Lyon Metz 460
+Paris Metz 330
+Paris Lyon 470
+Tours Paris 240
+Bordeaux Tours 350
+Toulouse Bordeaux 240
+Marseille Toulouse 410
+Lyon Marseille 320
+Metz Lyon 460
