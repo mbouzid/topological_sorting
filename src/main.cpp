@@ -66,7 +66,7 @@ int main( int argc , char * argv [] )
 			{
 				directed_graph<int> d ;
 				d.load("examples/villes.txt");
-				
+				d.display();
 				break ;
 			}//end case
 		}//end switch
